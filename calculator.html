@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <title>Tạo mã RSA</title>
+
+</head>
+
+<script>
+    $(document).ready(function () {
+        let size = 0
+        rsaInit = () => {
+            let p = $('#p').val()
+            let q = $('#q').val()
+            $.ajax({
+                url: 'http://localhost:8080/postService',
+                data: {
+                    serviceName: 'init',
+                    p,
+                    q
+                },
+                type: 'POST',
+                success: function (response) {
+                    const res = JSON.parse(response)
+                    console.log(res);
+                    $('#n').val(res.n)
+                    $('#r').val(res.r)
+                    let k = res.k
+                    let K_string = ''
+                    k.forEach((item) => {
+                        K_string += item + "\n"
+                    })
+                    $("#k").val(K_string)
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        checkED = () => {
+            const p = $('#p').val()
+            const q = $('#q').val()
+            const e = $('#e').val()
+            const d = $('#d').val()
+            $.ajax({
+                url: 'http://localhost:8080/postService',
+                data: {
+                    serviceName: 'checkKey',
+                    p,
+                    q,
+                    e
+                },
+                type: 'POST',
+                success: function (response) {
+                    const res = JSON.parse(response)
+                    console.log(res);
+                    $('#d').val(res.d)
+                    $("#checker").html(res.check)
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        encrypt = () => {
+            const p = $('#p').val()
+            const q = $('#q').val()
+            const e = $('#e').val()
+            const d = $('#d').val()
+            const msg = $('#msg').val()
+            $.ajax({
+                url: 'http://localhost:8080/postService',
+                data: {
+                    serviceName: 'encrypt',
+                    p,
+                    q,
+                    e,
+                    d,
+                    msg
+                },
+                type: 'POST',
+                success: function (response) {
+                    const res = JSON.parse(response)
+                    console.log(res);
+                    let size = res.encrypted_message[0].toString(10).length
+                    let encrypted_text = ''
+                    res.encrypted_message.forEach(item => {
+                        encrypted_text += item + ' '
+                    })
+                    // encrypted_text.slice(0, -1)
+                    $("#encrypted_text").html(encrypted_text)
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        decrypt = () => {
+            const p = $('#p').val()
+            const q = $('#q').val()
+            const e = $('#e').val()
+            const d = $('#d').val()
+            const encrypted_text = $('#encrypted_text').val()
+            encrypted_array = encrypted_text.split(' ')
+            encrypted_array.pop()
+            console.log(encrypted_array)
+            $.ajax({
+                url: 'http://localhost:8080/postService',
+                data: {
+                    serviceName: 'decrypt',
+                    p,
+                    q,
+                    e,
+                    d,
+                    encrypted_array
+                },
+                type: 'POST',
+                success: function (response) {
+                    const res = JSON.parse(response)
+                    console.log(res);
+                    $("#decrypted_text").html(res.decrypted_message)
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+    });
+</script>
+
+
+<body>
+    <h1>Tạo mã RSA</h1>
+    <h3><b>Bước 1. Tính N là tích của 2 số nguyên tố p và q:</b></h3>
+
+    <blockquote>
+        <p>Chọn 2 số nguyên tố p và q:</p>
+        <P><B>p</B> <input type="text" id="p" value="" size=15> </P>
+        <P><B>q</B> <input type="text" id="q" value="" size=15> </P>
+        <B><button type="button" name="pqNr" onclick="rsaInit()">Set p,q</button></B>
+        <HR>
+        Tính <b>n=pq</b>.<br>
+        Tính <B>r=(p-1)(q-1)</B> để chọn khoá công khai <b>e</b> và khoá bí mật <b>d</b>.
+        <p>Ta cần chọn <b>e</b> sao cho <b>e < r</b> và <b>gcd(e,r) = 1</b>. Sau đó tìm <b>d</b> sao cho <b>d < r</b> và
+                    <b>ed ≡ 1 (mod r)</b></p>
+        Để thuận tiện, ta tính trước danh sách những số <b>K</b> ≡ <B>1 (mod r)</B> và phân tích thành <b>tích
+            các thừa số nguyên tố</b> để dễ kiểm tra việc tạo
+        khoá <b>e</b> và <b>d</b>. <br />
+        <P><B>n = p*q</B> <input readonly type="text" id="n" name="n" value="" size=15></P>
+        <P><B>r = (p-1)*(q-1)</B><input readonly type="text" id="r" name="r" value="" size=15></P>
+        <P><B>K ≡ 1 (mod r):</B> <textarea readonly id='k' ROWS=10 COLS=60></textarea>
+    </blockquote>
+
+    <HR>
+    <h3> <b>Bước 2. Tạo
+            khoá công khai <b>e</b> và khoá bí mật <b>d</b>:</b></h3>
+    <blockquote>
+        <P>Dùng tích các thừa số nguyên tố từ số <B>K</B> ở trên để tạo khoá
+            <B>e</B> và <B>d</B>.
+        </P>
+        <P><B>e <input type="text" id="e" name="e" value="" size=15></B></P>
+        <p>Dùng thuật toán Euclid để tạo khoá bí mật <b>d</b></p>
+        <B><button type="button" name="ed3" onclick="checkED()">Tính d</button></B>
+        <P><B>d <input type="text" readonly id="d" name="d" value="" size=15></B></P>
+        <!-- <P><B>Kết quả kiểm tra:</B> <textarea id="checker" name="checker"></textarea> -->
+    </blockquote>
+
+    <HR>
+
+    <h3><B>Bước 3. Dùng khoá để mã hoá/giải mã bản rõ:</B></h3>
+
+    <BLOCKQUOTE>
+        <P>Điền bản rõ<B></B></P>
+        <P><B>Bản rõ <textarea id="msg" ROWS=5 COLS=120></textarea></B></P>
+        <P><B><button TYPE="button" name="ed4" onclick="encrypt()">Mã hoá</button></B></P>
+        <P><B>Bản mã <textarea id="encrypted_text" ROWS=5 COLS=120></textarea></B>
+            <br> Bản mã = (Bản rõ)<SUP>e</SUP> (mod n) </P>
+        <P><B>Giải mã </B>
+            <br> Msg = (Bản mã)<SUP>d</SUP> (mod n) </P>
+        <P><B><button TYPE="button" name="ed4" onclick="decrypt()">Giải mã</button></B></P>
+        <P><B>Kết quả <textarea id="decrypted_text" ROWS=5 COLS=120></textarea></B>
+    </BLOCKQUOTE>
+
+</body>
+
+</html>
