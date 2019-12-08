@@ -1,4 +1,4 @@
-from rsa import RSA, modInverse
+from rsa import RSA, modInverse, RSA_Cracker
 from flask import Flask, render_template, request, json
 from flask_cors import CORS
 
@@ -54,6 +54,14 @@ def postService():
         print(encrypted_msg)
         decrypted_message = rsa_ins.decrypt_message(encrypted_msg, d)
         return json.dumps({'status': 'OK', 'decrypted_message': decrypted_message})
+    if(request.form['serviceName'] == 'crack'):
+        n = int(request.form['n'])
+        e = int(request.form['e'])
+        print(n, e)
+        rsa_cracker_ins = RSA_Cracker(e, n)
+        p, q, phin = rsa_cracker_ins.find_pq()
+        d = modInverse(e, phin)
+        return json.dumps({'status': 'OK', 'p': p, 'q': q, 'r': phin, 'd': d})
 
 
 if __name__ == '__main__':

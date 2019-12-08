@@ -144,7 +144,7 @@ class RSA_Cracker:
 
     def find_pq(self):
         start_point = int(math.sqrt(self.n))
-        # print(start_point)
+        print(start_point)
         while(True):
             # print(self.n % start_point)
             if(self.n % start_point == 0):

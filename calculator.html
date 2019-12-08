@@ -143,19 +143,19 @@
 
     <blockquote>
         <p>Chọn 2 số nguyên tố p và q:</p>
-        <P><B>p</B> <input type="text" id="p" value="" size=15> </P>
-        <P><B>q</B> <input type="text" id="q" value="" size=15> </P>
+        <P><B>p</B> <input type="number" id="p" value="" size=15> </P>
+        <P><B>q</B> <input type="number" id="q" value="" size=15> </P>
         <B><button type="button" name="pqNr" onclick="rsaInit()">Set p,q</button></B>
         <HR>
         Tính <b>n=pq</b>.<br>
+        <P><B>n = p*q</B> <input readonly type="number" id="n" name="n" value="" size=15></P>
         Tính <B>r=(p-1)(q-1)</B> để chọn khoá công khai <b>e</b> và khoá bí mật <b>d</b>.
+        <P><B>r = (p-1)*(q-1)</B><input readonly type="number" id="r" name="r" value="" size=15></P>
         <p>Ta cần chọn <b>e</b> sao cho <b>e < r</b> và <b>gcd(e,r) = 1</b>. Sau đó tìm <b>d</b> sao cho <b>d < r</b> và
                     <b>ed ≡ 1 (mod r)</b></p>
         Để thuận tiện, ta tính trước danh sách những số <b>K</b> ≡ <B>1 (mod r)</B> và phân tích thành <b>tích
             các thừa số nguyên tố</b> để dễ kiểm tra việc tạo
         khoá <b>e</b> và <b>d</b>. <br />
-        <P><B>n = p*q</B> <input readonly type="text" id="n" name="n" value="" size=15></P>
-        <P><B>r = (p-1)*(q-1)</B><input readonly type="text" id="r" name="r" value="" size=15></P>
         <P><B>K ≡ 1 (mod r):</B> <textarea readonly id='k' ROWS=10 COLS=60></textarea>
     </blockquote>
 
@@ -166,10 +166,10 @@
         <P>Dùng tích các thừa số nguyên tố từ số <B>K</B> ở trên để tạo khoá
             <B>e</B> và <B>d</B>.
         </P>
-        <P><B>e <input type="text" id="e" name="e" value="" size=15></B></P>
+        <P><B>e <input type="number" id="e" name="e" value="" size=15></B></P>
         <p>Dùng thuật toán Euclid để tạo khoá bí mật <b>d</b></p>
         <B><button type="button" name="ed3" onclick="checkED()">Tính d</button></B>
-        <P><B>d <input type="text" readonly id="d" name="d" value="" size=15></B></P>
+        <P><B>d <input type="number" readonly id="d" name="d" value="" size=15></B></P>
         <!-- <P><B>Kết quả kiểm tra:</B> <textarea id="checker" name="checker"></textarea> -->
     </blockquote>
 

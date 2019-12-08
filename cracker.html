@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <title>Tạo mã RSA</title>
+
+</head>
+
+<script>
+  $(document).ready(function () {
+    let size = 0
+    crack = () => {
+      let n = $('#n').val()
+      let e = $('#e').val()
+      console.log("HERE");
+      $.ajax({
+        url: 'http://localhost:8080/postService',
+        data: {
+          serviceName: 'crack',
+          n,
+          e
+        },
+        type: 'POST',
+        success: function (response) {
+          const res = JSON.parse(response)
+          console.log(res);
+          $('#p').val(res.p)
+          $('#q').val(res.q)
+          $('#r').val(res.r)
+          $('#d').val(res.d)
+        },
+        error: function (error) {
+          console.log(error);
+        }
+      });
+    }
+  });
+</script>
+
+
+<body>
+  <h1>Phá mã RSA</h1>
+  <h3><b>Nhập n và khoá công khai e:</b></h3>
+
+  <blockquote>
+    <P><B>n</B> <input type="number" id="n" value="" size=15> </P>
+    <P><B>e</B> <input type="number" id="e" value="" size=15> </P>
+    <B><button type="button" onclick="crack()">Phá mã</button></B>
+    <HR>
+    Không mất tính tổng quát, giả sử <b>p < q</b>. <br> <br>
+        Để tính <B>p</B>, ta tìm <b>x = <a
+            href="https://www.codecogs.com/eqnedit.php?latex=\left&space;\lceil&space;\sqrt{n}&space;\right&space;\rceil"
+            target="_blank"><img
+              src="https://latex.codecogs.com/gif.latex?\left&space;\lceil&space;\sqrt{n}&space;\right&space;\rceil"
+              title="\left \lceil \sqrt{n} \right \rceil" /></a></b>, rồi số lẻ <b>p</b> nhỏ hơn <b>x</b> sao cho <b>n
+          chia hết cho p</b>
+        <br>
+        <P><B>p = </B> <input readonly type="number" id="p" value="" size=15></P>
+        <p>Sau khi có <b>p</b>, tính <b>q = n:p</b> và <b>r = (p-1)(q-1)</b></p>
+        <P><B>q = n:p</B> <input readonly type="number" id="q" value="" size=15></P>
+        <P><B>r = (p-1)*(q-1)</B><input readonly type="number" id="r" name="r" value="" size=15></P>
+        <p><b>d</b> (khoá bí mật) là số thoả mãn <b>ed ≡ 1 (mod r)</b>, tính bằng cách áp dụng thuật toán Eculid:</p>
+        <P><B>d <input type="number" readonly id="d" name="d" value="" size=15></B></P>
+  </blockquote>
+</body>
+
+</html>
